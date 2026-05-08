@@ -20,7 +20,7 @@ Built with **Node.js + Express + Socket.io** on the backend, **React + Vite** on
 ## 📁 Folder Structure
 
 ```
-liveblog/
+Real-Time-Blog-Platform/
 ├── backend/
 │   ├── prisma/
 │   │   ├── schema.prisma           # Database schema
@@ -123,5 +123,5 @@ liveblog/
 │
 ├── docker-compose.yml               # PostgreSQL + Redis services
 ├── .gitignore
-└── README.md                        # ← You are here
+└── README.md
 ```
