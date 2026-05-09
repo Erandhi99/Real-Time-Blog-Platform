@@ -2,6 +2,12 @@ import { Response, NextFunction } from "express";
 import { AuthRequest } from "../../types";
 import * as CommentService from "./comments.service";
 
+// Lazy import to avoid circular dependency
+const getIO = () => {
+  const { io } = require("../../../server");
+  return io;
+};
+
 export const listComments = async (
   req: AuthRequest,
   res: Response,
@@ -32,6 +38,8 @@ export const createComment = async (
       req.user!.id,
       req.body.body,
     );
+    // Broadcast to WebSocket room
+    broadcastNewComment(req.params.postId as string, comment);
     res.status(201).json(comment);
   } catch (err) {
     next(err);
@@ -50,6 +58,7 @@ export const replyToComment = async (
       req.body.body,
       req.params.commentId as string,
     );
+    broadcastNewComment(req.params.postId as string, comment);
     res.status(201).json(comment);
   } catch (err) {
     next(err);
@@ -66,5 +75,17 @@ export const deleteComment = async (
     res.status(204).send();
   } catch (err) {
     next(err);
+  }
+};
+
+const broadcastNewComment = (postId: string, comment: any) => {
+  try {
+    const {
+      broadcastNewComment: broadcast,
+    } = require("../../sockets/postRoom");
+    const { io } = require("../../../server");
+    broadcast(io, postId, comment);
+  } catch (e) {
+    console.error("Broadcast error:", e);
   }
 };
