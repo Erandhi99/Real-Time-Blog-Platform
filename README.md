@@ -389,19 +389,14 @@ Covers:
 - **No refresh token** — JWT expires and the user must log in again. A refresh token flow with httpOnly cookies was omitted for scope.
 - **In-memory reader count** — counts are stored in a `Map` in the server process. They reset on restart and would not be accurate across multiple Node.js instances without a Redis adapter.
 - **WebSocket auth is soft** — unauthenticated users can join post rooms and receive live updates (read-only), which matches the spec's public read access requirement.
-- **Plain text posts** — no rich text or markdown rendering. Post body is stored and displayed as plain text.
 - **Soft delete only** — deleted comments show `[deleted]` to preserve thread structure. There is no hard delete option.
-- **No rate limiting** — the API has no rate limiting on auth or comment endpoints.
+- **No new tags or categories** — new tags and categories can't be added.
 
 ---
 
 ## 🚀 Potential Improvements
 
-- **Redis adapter** for Socket.io to support horizontal scaling across multiple server instances
 - **Refresh token rotation** with httpOnly cookies for improved auth security
-- **Rich text editor** (e.g. Tiptap) for post authoring with markdown support
-- **Full-text search** using PostgreSQL `tsvector` and `to_tsquery`
 - **Email notifications** to post author when a new comment is posted
-- **Rate limiting** using `express-rate-limit` on auth and write endpoints
-- **Optimistic UI updates** for comment submission
+- **CREATE APIs** to add new tags and categories
 - **CI/CD pipeline** via GitHub Actions — lint, test, and build on every push
