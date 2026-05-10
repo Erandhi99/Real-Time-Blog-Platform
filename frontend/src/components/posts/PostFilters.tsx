@@ -11,6 +11,17 @@ interface Props {
   onSearchChange: (v: string) => void;
 }
 
+const inputStyle = {
+  padding: "7px 10px",
+  borderRadius: 8,
+  fontSize: 13,
+  border: "1px solid var(--border)",
+  background: "var(--surface)",
+  color: "var(--text1)",
+  outline: "none",
+  height: 34,
+};
+
 export default function PostFilters({
   category,
   tag,
@@ -24,90 +35,88 @@ export default function PostFilters({
     queryFn: getCategoriesApi,
   });
   const { data: tags } = useQuery({ queryKey: ["tags"], queryFn: getTagsApi });
-  const hasFilters = category || tag || search;
 
   return (
     <div
-      className="rounded-xl border p-4 mb-6"
-      style={{ background: "var(--bg-card)", borderColor: "var(--border)" }}
+      style={{
+        display: "flex",
+        flexWrap: "wrap",
+        gap: 8,
+        marginBottom: 20,
+        alignItems: "center",
+      }}
     >
-      <div className="flex flex-wrap gap-3 items-center">
-        <div className="relative flex-1 min-w-48">
-          <svg
-            className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4"
-            style={{ color: "var(--text-muted)" }}
-            fill="none"
-            stroke="currentColor"
-            strokeWidth="2"
-            viewBox="0 0 24 24"
-          >
-            <circle cx="11" cy="11" r="8" />
-            <path d="m21 21-4.35-4.35" />
-          </svg>
-          <input
-            type="text"
-            placeholder="Search posts..."
-            value={search}
-            onChange={(e) => onSearchChange(e.target.value)}
-            className="w-full pl-9 pr-3 py-2 text-sm rounded-lg border focus:outline-none focus:ring-2 transition"
-            style={{
-              background: "var(--bg-secondary)",
-              borderColor: "var(--border)",
-              color: "var(--text-primary)",
-            }}
-          />
-        </div>
-        <select
-          value={category}
-          onChange={(e) => onCategoryChange(e.target.value)}
-          className="px-3 py-2 text-sm rounded-lg border focus:outline-none focus:ring-2 transition"
+      <div style={{ position: "relative", flex: "1 1 180px" }}>
+        <svg
           style={{
-            background: "var(--bg-secondary)",
-            borderColor: "var(--border)",
-            color: "var(--text-primary)",
+            position: "absolute",
+            left: 9,
+            top: "50%",
+            transform: "translateY(-50%)",
+            color: "var(--text3)",
           }}
+          width="13"
+          height="13"
+          fill="none"
+          stroke="currentColor"
+          strokeWidth="2"
+          viewBox="0 0 24 24"
         >
-          <option value="">All categories</option>
-          {categories?.map((c: Category) => (
-            <option key={c.id} value={c.slug}>
-              {c.name}
-            </option>
-          ))}
-        </select>
-        <select
-          value={tag}
-          onChange={(e) => onTagChange(e.target.value)}
-          className="px-3 py-2 text-sm rounded-lg border focus:outline-none focus:ring-2 transition"
-          style={{
-            background: "var(--bg-secondary)",
-            borderColor: "var(--border)",
-            color: "var(--text-primary)",
-          }}
-        >
-          <option value="">All tags</option>
-          {tags?.map((t: Tag) => (
-            <option key={t.id} value={t.slug}>
-              {t.name}
-            </option>
-          ))}
-        </select>
-        {hasFilters && (
-          <button
-            onClick={() => {
-              onCategoryChange("");
-              onTagChange("");
-              onSearchChange("");
-            }}
-            className="text-xs px-3 py-2 rounded-lg transition"
-            style={{
-              color: "var(--danger)",
-              background: "var(--danger-light)",
-            }}
-          >
-            Clear
-          </button>
-        )}
+          <circle cx="11" cy="11" r="8" />
+          <path d="m21 21-4.35-4.35" />
+        </svg>
+        <input
+          value={search}
+          onChange={(e) => onSearchChange(e.target.value)}
+          placeholder="Search posts…"
+          style={{ ...inputStyle, paddingLeft: 28, width: "100%" }}
+        />
       </div>
+
+      <select
+        value={category}
+        onChange={(e) => onCategoryChange(e.target.value)}
+        style={inputStyle}
+      >
+        <option value="">All categories</option>
+        {categories?.map((c: Category) => (
+          <option key={c.id} value={c.slug}>
+            {c.name}
+          </option>
+        ))}
+      </select>
+
+      <select
+        value={tag}
+        onChange={(e) => onTagChange(e.target.value)}
+        style={inputStyle}
+      >
+        <option value="">All tags</option>
+        {tags?.map((t: Tag) => (
+          <option key={t.id} value={t.slug}>
+            {t.name}
+          </option>
+        ))}
+      </select>
+
+      {(category || tag || search) && (
+        <button
+          onClick={() => {
+            onCategoryChange("");
+            onTagChange("");
+            onSearchChange("");
+          }}
+          style={{
+            ...inputStyle,
+            cursor: "pointer",
+            color: "var(--danger)",
+            background: "var(--danger-bg)",
+            border: "1px solid var(--danger-bg)",
+          }}
+        >
+          Clear
+        </button>
+      )}
     </div>
   );
 }

@@ -1,13 +1,13 @@
 import { useState } from "react";
-import type { CommentNode as CommentNodeType } from "../../types";
+import type { CommentNode as T } from "../../types";
 import { formatDate } from "../../utils/formatDate";
 import { useAuthStore } from "../../store/authStore";
 import CommentForm from "./CommentForm";
 
 interface Props {
-  comment: CommentNodeType;
+  comment: T;
   postId: string;
-  onReply: (commentId: string, body: string) => Promise<void>;
+  onReply: (id: string, body: string) => Promise<void>;
   depth?: number;
 }
 
@@ -19,95 +19,125 @@ export default function CommentNode({
 }: Props) {
   const [showReply, setShowReply] = useState(false);
   const { isAuthenticated } = useAuthStore();
-  const maxDepth = 4;
-
-  const handleReply = async (body: string) => {
-    await onReply(comment.id, body);
-    setShowReply(false);
-  };
 
   return (
-    <div className="flex gap-3">
+    <div style={{ display: "flex", gap: 10 }}>
       {/* Avatar */}
-      <div className="flex-shrink-0">
+      <div
+        style={{
+          flexShrink: 0,
+          display: "flex",
+          flexDirection: "column",
+          alignItems: "center",
+        }}
+      >
         <div
-          className="w-8 h-8 rounded-full flex items-center justify-center text-xs font-bold text-white"
           style={{
-            background: `hsl(${comment.author.username.charCodeAt(0) * 15}, 60%, 50%)`,
+            width: 28,
+            height: 28,
+            borderRadius: "50%",
+            flexShrink: 0,
+            background: `hsl(${(comment.author.username.charCodeAt(0) * 17) % 360}, 55%, 50%)`,
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
+            color: "#fff",
+            fontSize: 11,
+            fontWeight: 700,
           }}
         >
           {comment.author.username[0].toUpperCase()}
         </div>
-        {/* Thread line */}
-        {comment.replies.length > 0 && (
+        {(comment.replies.length > 0 || showReply) && (
           <div
-            className="w-px mx-auto mt-2 flex-1"
             style={{
+              width: 1,
+              flex: 1,
               background: "var(--border)",
-              minHeight: "16px",
-              height: "calc(100% - 36px)",
+              marginTop: 6,
+              minHeight: 16,
             }}
           />
         )}
       </div>
 
-      <div className="flex-1 min-w-0 pb-4">
-        {/* Header */}
-        <div className="flex items-center gap-2 mb-1 flex-wrap">
+      {/* Content */}
+      <div style={{ flex: 1, minWidth: 0, paddingBottom: 16 }}>
+        <div
+          style={{
+            display: "flex",
+            alignItems: "center",
+            gap: 8,
+            marginBottom: 4,
+            flexWrap: "wrap",
+          }}
+        >
           <span
-            className="text-sm font-semibold"
-            style={{ color: "var(--text-primary)" }}
+            style={{ fontSize: 13, fontWeight: 600, color: "var(--text1)" }}
           >
             {comment.author.username}
           </span>
-          <span className="text-xs" style={{ color: "var(--text-muted)" }}>
+          <span style={{ fontSize: 11, color: "var(--text3)" }}>
             {formatDate(comment.createdAt)}
           </span>
         </div>
 
-        {/* Body */}
         <p
-          className="text-sm leading-relaxed mb-2"
           style={{
-            color: comment.deleted
-              ? "var(--text-muted)"
-              : "var(--text-secondary)",
+            fontSize: 13,
+            color: comment.deleted ? "var(--text3)" : "var(--text2)",
             fontStyle: comment.deleted ? "italic" : "normal",
+            lineHeight: 1.55,
+            marginBottom: 6,
           }}
         >
           {comment.deleted ? "[deleted]" : comment.body}
         </p>
 
-        {/* Reply button */}
-        {isAuthenticated && !comment.deleted && depth < maxDepth && (
+        {isAuthenticated && !comment.deleted && depth < 4 && (
           <button
             onClick={() => setShowReply(!showReply)}
-            className="text-xs font-medium transition"
-            style={{ color: "var(--accent)" }}
+            style={{
+              fontSize: 11,
+              fontWeight: 600,
+              color: "var(--accent)",
+              background: "none",
+              border: "none",
+              cursor: "pointer",
+              padding: 0,
+            }}
           >
             {showReply ? "Cancel" : "↩ Reply"}
           </button>
         )}
 
-        {/* Reply form */}
         {showReply && (
-          <div className="mt-3">
+          <div style={{ marginTop: 10 }}>
             <CommentForm
-              onSubmit={handleReply}
-              placeholder={`Reply to ${comment.author.username}...`}
+              onSubmit={async (body) => {
+                await onReply(comment.id, body);
+                setShowReply(false);
+              }}
+              placeholder={`Reply to ${comment.author.username}…`}
               autoFocus
               onCancel={() => setShowReply(false)}
             />
           </div>
         )}
 
-        {/* Nested replies */}
         {comment.replies.length > 0 && (
-          <div className="mt-4 space-y-4">
-            {comment.replies.map((reply) => (
+          <div
+            style={{
+              marginTop: 14,
+              display: "flex",
+              flexDirection: "column",
+              gap: 0,
+            }}
+          >
+            {comment.replies.map((r) => (
               <CommentNode
-                key={reply.id}
-                comment={reply}
+                key={r.id}
+                comment={r}
                 postId={postId}
                 onReply={onReply}
                 depth={depth + 1}

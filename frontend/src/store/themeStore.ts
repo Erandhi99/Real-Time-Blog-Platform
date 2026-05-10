@@ -2,20 +2,24 @@ import { create } from "zustand";
 
 type Theme = "light" | "dark";
 
+const apply = (t: Theme) => {
+  document.documentElement.setAttribute("data-theme", t);
+  localStorage.setItem("theme", t);
+};
+
+const initial = (localStorage.getItem("theme") as Theme) ?? "light";
+apply(initial);
+
 interface ThemeState {
   theme: Theme;
   toggle: () => void;
 }
 
-const stored = (localStorage.getItem("theme") as Theme) ?? "light";
-document.documentElement.setAttribute("data-theme", stored);
-
 export const useThemeStore = create<ThemeState>((set, get) => ({
-  theme: stored,
+  theme: initial,
   toggle: () => {
     const next = get().theme === "light" ? "dark" : "light";
-    localStorage.setItem("theme", next);
-    document.documentElement.setAttribute("data-theme", next);
+    apply(next);
     set({ theme: next });
   },
 }));

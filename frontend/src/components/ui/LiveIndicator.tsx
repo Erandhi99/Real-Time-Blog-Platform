@@ -1,24 +1,49 @@
-interface Props {
-  count: number;
-}
-
-export default function LiveIndicator({ count }: Props) {
+export default function LiveIndicator({ count }: { count: number }) {
   return (
     <div
-      className="flex items-center gap-2 px-3 py-1.5 rounded-full text-sm font-medium"
-      style={{ background: "var(--accent-light)", color: "var(--accent-text)" }}
+      style={{
+        display: "inline-flex",
+        alignItems: "center",
+        gap: 6,
+        padding: "4px 10px",
+        borderRadius: 20,
+        background: "var(--accent-bg)",
+        border: "1px solid var(--accent-bg)",
+        fontSize: 12,
+        fontWeight: 600,
+        color: "var(--accent-text)",
+      }}
     >
-      <span className="relative flex h-2 w-2">
+      <span
+        style={{
+          position: "relative",
+          display: "inline-flex",
+          width: 8,
+          height: 8,
+        }}
+      >
         <span
-          className="animate-ping absolute inline-flex h-full w-full rounded-full opacity-75"
-          style={{ background: "var(--accent)" }}
+          style={{
+            position: "absolute",
+            inset: 0,
+            borderRadius: "50%",
+            background: "var(--accent)",
+            opacity: 0.6,
+            animation: "ping 1.2s cubic-bezier(0,0,0.2,1) infinite",
+          }}
         />
         <span
-          className="relative inline-flex rounded-full h-2 w-2"
-          style={{ background: "var(--accent)" }}
+          style={{
+            width: 8,
+            height: 8,
+            borderRadius: "50%",
+            background: "var(--accent)",
+            display: "block",
+          }}
         />
       </span>
-      {count} {count === 1 ? "reader" : "readers"} live
+      {count} {count === 1 ? "reader" : "readers"}
+      <style>{`@keyframes ping { 75%,100%{transform:scale(2);opacity:0} }`}</style>
     </div>
   );
 }

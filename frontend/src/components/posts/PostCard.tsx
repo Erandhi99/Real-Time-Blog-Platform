@@ -1,73 +1,131 @@
+import React from "react";
 import { Link } from "react-router-dom";
 import type { Post } from "../../types";
-import Badge from "../ui/Badge";
 import { formatDate } from "../../utils/formatDate";
 
 export default function PostCard({ post }: { post: Post }) {
   return (
-    <Link to={`/posts/${post.id}`} className="block group">
+    <Link to={`/posts/${post.id}`} style={{ display: "block" }}>
       <article
-        className="rounded-xl border p-5 sm:p-6 transition-all duration-200 group-hover:shadow-md"
         style={{
-          background: "var(--bg-card)",
-          borderColor: "var(--border)",
-          boxShadow: "var(--shadow)",
+          background: "var(--surface)",
+          border: "1px solid var(--border)",
+          borderRadius: "var(--radius-lg)",
+          padding: "16px 20px",
+          transition: "border-color 0.15s",
+          cursor: "pointer",
         }}
+        onMouseEnter={(e) =>
+          (e.currentTarget.style.borderColor = "var(--accent)")
+        }
+        onMouseLeave={(e) =>
+          (e.currentTarget.style.borderColor = "var(--border)")
+        }
       >
-        <div className="flex items-start justify-between gap-4">
-          <div className="flex-1 min-w-0">
-            <div className="flex flex-wrap gap-1.5 mb-2.5">
-              <Badge variant="accent">{post.category.name}</Badge>
-              {post.tags.slice(0, 3).map(({ tag }) => (
-                <Badge key={tag.id}>{tag.name}</Badge>
-              ))}
-            </div>
-            <h2
-              className="text-base sm:text-lg font-semibold mb-1.5 leading-snug line-clamp-2 group-hover:underline"
-              style={{ color: "var(--text-primary)" }}
-            >
-              {post.title}
-            </h2>
-            <p
-              className="text-sm line-clamp-2 mb-3"
-              style={{ color: "var(--text-secondary)" }}
-            >
-              {post.body}
-            </p>
-          </div>
-        </div>
+        {/* Tags row */}
         <div
-          className="flex items-center justify-between text-xs pt-3 border-t"
-          style={{ borderColor: "var(--border)", color: "var(--text-muted)" }}
+          style={{ display: "flex", gap: 6, flexWrap: "wrap", marginBottom: 8 }}
         >
-          <div className="flex items-center gap-2">
-            <div
-              className="w-5 h-5 rounded-full flex items-center justify-center text-white font-bold"
+          <span
+            style={{
+              fontSize: 11,
+              fontWeight: 600,
+              padding: "2px 8px",
+              borderRadius: 20,
+              background: "var(--accent-bg)",
+              color: "var(--accent-text)",
+            }}
+          >
+            {post.category.name}
+          </span>
+          {post.tags.slice(0, 3).map(({ tag }) => (
+            <span
+              key={tag.id}
               style={{
-                fontSize: "9px",
-                background: `hsl(${post.author.username.charCodeAt(0) * 15}, 60%, 50%)`,
+                fontSize: 11,
+                fontWeight: 500,
+                padding: "2px 8px",
+                borderRadius: 20,
+                background: "var(--surface2)",
+                color: "var(--text3)",
+                border: "1px solid var(--border)",
+              }}
+            >
+              {tag.name}
+            </span>
+          ))}
+        </div>
+
+        {/* Title */}
+        <h2
+          style={{
+            fontSize: 15,
+            fontWeight: 600,
+            color: "var(--text1)",
+            margin: "0 0 4px",
+            lineHeight: 1.4,
+            overflow: "hidden",
+            display: "-webkit-box",
+            WebkitLineClamp: 2,
+            WebkitBoxOrient:
+              "vertical" as React.CSSProperties["WebkitBoxOrient"],
+          }}
+        >
+          {post.title}
+        </h2>
+
+        {/* Excerpt */}
+        <p
+          style={{
+            fontSize: 13,
+            color: "var(--text3)",
+            margin: "0 0 12px",
+            overflow: "hidden",
+            display: "-webkit-box",
+            WebkitLineClamp: 2,
+            WebkitBoxOrient:
+              "vertical" as React.CSSProperties["WebkitBoxOrient"],
+            lineHeight: 1.5,
+          }}
+        >
+          {post.body}
+        </p>
+
+        {/* Footer */}
+        <div
+          style={{
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "space-between",
+            fontSize: 12,
+            color: "var(--text3)",
+            borderTop: "1px solid var(--border)",
+            paddingTop: 10,
+          }}
+        >
+          <div style={{ display: "flex", alignItems: "center", gap: 6 }}>
+            <div
+              style={{
+                width: 20,
+                height: 20,
+                borderRadius: "50%",
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "center",
+                background: `hsl(${(post.author.username.charCodeAt(0) * 17) % 360}, 55%, 50%)`,
+                color: "#fff",
+                fontSize: 9,
+                fontWeight: 700,
               }}
             >
               {post.author.username[0].toUpperCase()}
             </div>
-            <span style={{ color: "var(--text-secondary)" }}>
+            <span style={{ color: "var(--text2)", fontWeight: 500 }}>
               {post.author.username}
             </span>
           </div>
-          <div className="flex items-center gap-3">
-            <span className="flex items-center gap-1">
-              <svg
-                width="12"
-                height="12"
-                fill="none"
-                stroke="currentColor"
-                strokeWidth="2"
-                viewBox="0 0 24 24"
-              >
-                <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z" />
-              </svg>
-              {post._count.comments}
-            </span>
+          <div style={{ display: "flex", gap: 14 }}>
+            <span>{post._count.comments} comments</span>
             <span>{formatDate(post.createdAt)}</span>
           </div>
         </div>

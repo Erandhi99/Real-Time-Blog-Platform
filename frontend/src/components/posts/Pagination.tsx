@@ -10,35 +10,52 @@ export default function Pagination({ page, totalPages, onPageChange }: Props) {
   const pages = Array.from({ length: totalPages }, (_, i) => i + 1)
     .filter((p) => p === 1 || p === totalPages || Math.abs(p - page) <= 1)
     .reduce<(number | string)[]>((acc, p, i, arr) => {
-      if (i > 0 && (p as number) - (arr[i - 1] as number) > 1) acc.push("...");
+      if (i > 0 && (p as number) - (arr[i - 1] as number) > 1) acc.push("…");
       acc.push(p);
       return acc;
     }, []);
 
-  const btnBase =
-    "px-3 py-1.5 text-sm rounded-lg border transition font-medium";
+  const btn = (active: boolean, disabled = false) => ({
+    minWidth: 32,
+    height: 32,
+    padding: "0 10px",
+    borderRadius: 8,
+    fontSize: 13,
+    fontWeight: active ? 600 : 400,
+    cursor: disabled ? "not-allowed" : "pointer",
+    border: `1px solid ${active ? "var(--accent)" : "var(--border)"}`,
+    background: active ? "var(--accent)" : "var(--surface)",
+    color: active ? "#fff" : disabled ? "var(--text3)" : "var(--text2)",
+    opacity: disabled ? 0.45 : 1,
+    transition: "all 0.12s",
+  });
 
   return (
-    <div className="flex items-center justify-center gap-1.5 mt-8 flex-wrap">
+    <div
+      style={{
+        display: "flex",
+        justifyContent: "center",
+        gap: 6,
+        marginTop: 28,
+        flexWrap: "wrap",
+      }}
+    >
       <button
         onClick={() => onPageChange(page - 1)}
         disabled={page === 1}
-        className={btnBase}
-        style={{
-          borderColor: "var(--border)",
-          background: "var(--bg-card)",
-          color: page === 1 ? "var(--text-muted)" : "var(--text-primary)",
-          opacity: page === 1 ? 0.4 : 1,
-        }}
+        style={btn(false, page === 1)}
       >
         ← Prev
       </button>
       {pages.map((p, i) =>
-        p === "..." ? (
+        p === "…" ? (
           <span
-            key={`e-${i}`}
-            style={{ color: "var(--text-muted)" }}
-            className="px-1"
+            key={`e${i}`}
+            style={{
+              lineHeight: "32px",
+              color: "var(--text3)",
+              padding: "0 4px",
+            }}
           >
             …
           </span>
@@ -46,12 +63,7 @@ export default function Pagination({ page, totalPages, onPageChange }: Props) {
           <button
             key={p}
             onClick={() => onPageChange(p as number)}
-            className={btnBase}
-            style={{
-              borderColor: p === page ? "var(--accent)" : "var(--border)",
-              background: p === page ? "var(--accent)" : "var(--bg-card)",
-              color: p === page ? "white" : "var(--text-primary)",
-            }}
+            style={btn(p === page)}
           >
             {p}
           </button>
@@ -60,14 +72,7 @@ export default function Pagination({ page, totalPages, onPageChange }: Props) {
       <button
         onClick={() => onPageChange(page + 1)}
         disabled={page === totalPages}
-        className={btnBase}
-        style={{
-          borderColor: "var(--border)",
-          background: "var(--bg-card)",
-          color:
-            page === totalPages ? "var(--text-muted)" : "var(--text-primary)",
-          opacity: page === totalPages ? 0.4 : 1,
-        }}
+        style={btn(false, page === totalPages)}
       >
         Next →
       </button>

@@ -4,6 +4,24 @@ import { useAuthStore } from "../store/authStore";
 import { registerApi } from "../api/auth";
 import axios from "axios";
 
+const inputStyle = {
+  width: "100%",
+  padding: "9px 12px",
+  borderRadius: 8,
+  fontSize: 14,
+  border: "1px solid var(--border)",
+  background: "var(--surface2)",
+  color: "var(--text1)",
+  outline: "none",
+};
+const labelStyle = {
+  display: "block",
+  fontSize: 13,
+  fontWeight: 600,
+  color: "var(--text2)",
+  marginBottom: 5,
+};
+
 export default function RegisterPage() {
   const [email, setEmail] = useState("");
   const [username, setUsername] = useState("");
@@ -33,69 +51,113 @@ export default function RegisterPage() {
   };
 
   return (
-    <div className="max-w-md mx-auto mt-16">
-      <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-8">
-        <h1 className="text-2xl font-bold text-gray-900 mb-6">
-          Create an account
+    <div style={{ maxWidth: 400, margin: "48px auto" }}>
+      <div
+        style={{
+          background: "var(--surface)",
+          border: "1px solid var(--border)",
+          borderRadius: "var(--radius-lg)",
+          padding: "32px 28px",
+        }}
+      >
+        <h1
+          style={{
+            fontSize: 20,
+            fontWeight: 700,
+            color: "var(--text1)",
+            marginBottom: 6,
+          }}
+        >
+          Create account
         </h1>
+        <p style={{ fontSize: 13, color: "var(--text3)", marginBottom: 24 }}>
+          Join the community
+        </p>
+
         {error && (
-          <div className="mb-4 p-3 bg-red-50 border border-red-200 text-red-700 rounded-lg text-sm">
+          <div
+            style={{
+              padding: "10px 12px",
+              borderRadius: 8,
+              fontSize: 13,
+              background: "var(--danger-bg)",
+              color: "var(--danger)",
+              marginBottom: 16,
+            }}
+          >
             {error}
           </div>
         )}
-        <form onSubmit={handleSubmit} className="space-y-4">
+
+        <form
+          onSubmit={handleSubmit}
+          style={{ display: "flex", flexDirection: "column", gap: 16 }}
+        >
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">
-              Email
-            </label>
+            <label style={labelStyle}>Email</label>
             <input
               type="email"
               value={email}
               onChange={(e) => setEmail(e.target.value)}
               required
-              className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500"
               placeholder="you@example.com"
+              style={inputStyle}
             />
           </div>
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">
-              Username
-            </label>
+            <label style={labelStyle}>Username</label>
             <input
               type="text"
               value={username}
               onChange={(e) => setUsername(e.target.value)}
               required
               minLength={3}
-              className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500"
               placeholder="cooluser"
+              style={inputStyle}
             />
           </div>
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">
-              Password
-            </label>
+            <label style={labelStyle}>Password</label>
             <input
               type="password"
               value={password}
               onChange={(e) => setPassword(e.target.value)}
               required
               minLength={6}
-              className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500"
-              placeholder="••••••••"
+              placeholder="min 6 characters"
+              style={inputStyle}
             />
           </div>
           <button
             type="submit"
             disabled={loading}
-            className="w-full bg-indigo-600 text-white py-2 rounded-lg text-sm font-medium hover:bg-indigo-700 disabled:opacity-50 transition"
+            style={{
+              padding: "10px",
+              borderRadius: 8,
+              border: "none",
+              background: "var(--accent)",
+              color: "#fff",
+              fontSize: 14,
+              fontWeight: 600,
+              cursor: loading ? "not-allowed" : "pointer",
+              opacity: loading ? 0.7 : 1,
+              marginTop: 4,
+            }}
           >
-            {loading ? "Creating account..." : "Create account"}
+            {loading ? "Creating account…" : "Create account"}
           </button>
         </form>
-        <p className="mt-4 text-sm text-gray-600 text-center">
+
+        <p
+          style={{
+            fontSize: 13,
+            color: "var(--text3)",
+            textAlign: "center",
+            marginTop: 20,
+          }}
+        >
           Already have an account?{" "}
-          <Link to="/login" className="text-indigo-600 hover:underline">
+          <Link to="/login" style={{ color: "var(--accent)", fontWeight: 500 }}>
             Sign in
           </Link>
         </p>

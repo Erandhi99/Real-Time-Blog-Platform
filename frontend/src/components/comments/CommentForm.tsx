@@ -1,5 +1,4 @@
 import { useState } from "react";
-import Button from "../ui/Button";
 import axios from "axios";
 
 interface Props {
@@ -11,7 +10,7 @@ interface Props {
 
 export default function CommentForm({
   onSubmit,
-  placeholder = "Write a comment...",
+  placeholder = "Write a comment…",
   autoFocus = false,
   onCancel,
 }: Props) {
@@ -46,30 +45,68 @@ export default function CommentForm({
         placeholder={placeholder}
         autoFocus={autoFocus}
         rows={3}
-        className="w-full text-sm rounded-xl p-3 resize-none focus:outline-none focus:ring-2 transition"
-        style={
-          {
-            background: "var(--bg-secondary)",
-            border: "1px solid var(--border)",
-            color: "var(--text-primary)",
-            "--tw-ring-color": "var(--accent)",
-          } as React.CSSProperties
-        }
+        style={{
+          width: "100%",
+          padding: "10px 12px",
+          borderRadius: 8,
+          fontSize: 13,
+          border: "1px solid var(--border)",
+          background: "var(--surface2)",
+          color: "var(--text1)",
+          resize: "none",
+          outline: "none",
+          lineHeight: 1.5,
+          fontFamily: "inherit",
+        }}
       />
       {error && (
-        <p className="text-xs mt-1" style={{ color: "var(--danger)" }}>
+        <p style={{ fontSize: 12, color: "var(--danger)", marginTop: 4 }}>
           {error}
         </p>
       )}
-      <div className="flex gap-2 mt-2 justify-end">
+      <div
+        style={{
+          display: "flex",
+          gap: 8,
+          justifyContent: "flex-end",
+          marginTop: 8,
+        }}
+      >
         {onCancel && (
-          <Button type="button" variant="ghost" size="sm" onClick={onCancel}>
+          <button
+            type="button"
+            onClick={onCancel}
+            style={{
+              padding: "6px 12px",
+              borderRadius: 7,
+              border: "1px solid var(--border)",
+              background: "transparent",
+              color: "var(--text2)",
+              fontSize: 12,
+              cursor: "pointer",
+              fontWeight: 500,
+            }}
+          >
             Cancel
-          </Button>
+          </button>
         )}
-        <Button type="submit" size="sm" disabled={loading || !body.trim()}>
-          {loading ? "Posting..." : "Post"}
-        </Button>
+        <button
+          type="submit"
+          disabled={loading || !body.trim()}
+          style={{
+            padding: "6px 14px",
+            borderRadius: 7,
+            border: "none",
+            background: "var(--accent)",
+            color: "#fff",
+            fontSize: 12,
+            cursor: loading || !body.trim() ? "not-allowed" : "pointer",
+            fontWeight: 600,
+            opacity: loading || !body.trim() ? 0.6 : 1,
+          }}
+        >
+          {loading ? "Posting…" : "Post"}
+        </button>
       </div>
     </form>
   );

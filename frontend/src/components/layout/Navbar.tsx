@@ -7,53 +7,104 @@ export default function Navbar() {
   const { theme, toggle } = useThemeStore();
   const navigate = useNavigate();
 
-  const handleLogout = () => {
-    clearAuth();
-    navigate("/");
+  const s = {
+    nav: {
+      background: "var(--surface)",
+      borderBottom: "1px solid var(--border)",
+      position: "sticky" as const,
+      top: 0,
+      zIndex: 50,
+    },
+    inner: {
+      maxWidth: 960,
+      margin: "0 auto",
+      padding: "0 16px",
+      height: 56,
+      display: "flex",
+      alignItems: "center",
+      justifyContent: "space-between",
+    },
+    logo: {
+      display: "flex",
+      alignItems: "center",
+      gap: 8,
+      fontWeight: 700,
+      fontSize: 17,
+      color: "var(--text1)",
+    },
+    logoDot: {
+      width: 28,
+      height: 28,
+      borderRadius: 8,
+      background: "var(--accent)",
+      display: "flex",
+      alignItems: "center",
+      justifyContent: "center",
+      color: "#fff",
+      fontSize: 13,
+      fontWeight: 700,
+    },
+    right: { display: "flex", alignItems: "center", gap: 8 },
+    iconBtn: {
+      width: 34,
+      height: 34,
+      borderRadius: 8,
+      border: "1px solid var(--border)",
+      background: "var(--surface2)",
+      color: "var(--text2)",
+      cursor: "pointer",
+      display: "flex",
+      alignItems: "center",
+      justifyContent: "center",
+    },
+    ghostBtn: {
+      padding: "6px 12px",
+      borderRadius: 8,
+      border: "1px solid var(--border)",
+      background: "transparent",
+      color: "var(--text2)",
+      cursor: "pointer",
+      fontSize: 13,
+      fontWeight: 500,
+    },
+    primaryBtn: {
+      padding: "6px 14px",
+      borderRadius: 8,
+      border: "none",
+      background: "var(--accent)",
+      color: "#fff",
+      cursor: "pointer",
+      fontSize: 13,
+      fontWeight: 600,
+      display: "flex",
+      alignItems: "center",
+      gap: 5,
+    },
+    userText: {
+      fontSize: 13,
+      color: "var(--text3)",
+    },
   };
 
   return (
-    <nav
-      className="sticky top-0 z-50 border-b"
-      style={{
-        background: "var(--bg-card)",
-        borderColor: "var(--border)",
-        boxShadow: "var(--shadow)",
-      }}
-    >
-      <div className="max-w-6xl mx-auto px-4 sm:px-6 h-16 flex items-center justify-between">
-        {/* Logo */}
-        <Link to="/" className="flex items-center gap-2 group">
-          <div
-            className="w-8 h-8 rounded-lg flex items-center justify-center text-white text-sm font-bold"
-            style={{ background: "var(--accent)" }}
-          >
-            L
-          </div>
-          <span
-            className="text-lg font-bold"
-            style={{ color: "var(--text-primary)" }}
-          >
-            LiveBlog
-          </span>
+    <nav style={s.nav}>
+      <div style={s.inner}>
+        <Link to="/" style={s.logo}>
+          <div style={s.logoDot}>L</div>
+          LiveBlog
         </Link>
 
-        {/* Right side */}
-        <div className="flex items-center gap-2 sm:gap-3">
-          {/* Dark mode toggle */}
+        <div style={s.right}>
           <button
             onClick={toggle}
-            className="w-9 h-9 rounded-lg flex items-center justify-center transition-colors"
-            style={{
-              background: "var(--bg-hover)",
-              color: "var(--text-secondary)",
-            }}
-            title={`Switch to ${theme === "light" ? "dark" : "light"} mode`}
+            style={s.iconBtn}
+            title="Toggle theme"
+            aria-label="Toggle theme"
           >
             {theme === "light" ? (
               <svg
-                width="18"
-                height="18"
+                width="15"
+                height="15"
                 fill="none"
                 stroke="currentColor"
                 strokeWidth="2"
@@ -63,8 +114,8 @@ export default function Navbar() {
               </svg>
             ) : (
               <svg
-                width="18"
-                height="18"
+                width="15"
+                height="15"
                 fill="none"
                 stroke="currentColor"
                 strokeWidth="2"
@@ -78,20 +129,11 @@ export default function Navbar() {
 
           {isAuthenticated ? (
             <>
-              <span
-                className="hidden sm:block text-sm font-medium"
-                style={{ color: "var(--text-secondary)" }}
-              >
-                {user?.username}
-              </span>
-              <Link
-                to="/create"
-                className="flex items-center gap-1.5 text-sm font-medium px-3 py-1.5 rounded-lg text-white transition"
-                style={{ background: "var(--accent)" }}
-              >
+              <span style={s.userText}>{user?.username}</span>
+              <Link to="/create" style={s.primaryBtn}>
                 <svg
-                  width="14"
-                  height="14"
+                  width="13"
+                  height="13"
                   fill="none"
                   stroke="currentColor"
                   strokeWidth="2.5"
@@ -99,36 +141,24 @@ export default function Navbar() {
                 >
                   <path d="M12 5v14M5 12h14" />
                 </svg>
-                <span className="hidden sm:inline">New Post</span>
+                New post
               </Link>
               <button
-                onClick={handleLogout}
-                className="text-sm px-3 py-1.5 rounded-lg transition"
-                style={{
-                  color: "var(--text-secondary)",
-                  background: "var(--bg-hover)",
+                onClick={() => {
+                  clearAuth();
+                  navigate("/");
                 }}
+                style={s.ghostBtn}
               >
                 Logout
               </button>
             </>
           ) : (
             <>
-              <Link
-                to="/login"
-                className="text-sm font-medium px-3 py-1.5 rounded-lg transition"
-                style={{
-                  color: "var(--text-secondary)",
-                  background: "var(--bg-hover)",
-                }}
-              >
+              <Link to="/login" style={s.ghostBtn as React.CSSProperties}>
                 Login
               </Link>
-              <Link
-                to="/register"
-                className="text-sm font-medium px-3 py-1.5 rounded-lg text-white transition"
-                style={{ background: "var(--accent)" }}
-              >
+              <Link to="/register" style={s.primaryBtn as React.CSSProperties}>
                 Register
               </Link>
             </>
