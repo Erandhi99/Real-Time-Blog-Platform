@@ -31,3 +31,7 @@ export const replyToCommentApi = async (
   );
   return res.data;
 };
+
+export const deleteCommentApi = async (commentId: string): Promise<void> => {
+  await apiClient.delete(`/comments/${commentId}`);
+};

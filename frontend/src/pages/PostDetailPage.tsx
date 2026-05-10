@@ -2,11 +2,6 @@ import { useParams, Link, useNavigate } from "react-router-dom";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { useState } from "react";
 import { getPostApi, deletePostApi } from "../api/posts";
-import {
-  getCommentsApi,
-  createCommentApi,
-  replyToCommentApi,
-} from "../api/comments";
 import { useAuthStore } from "../store/authStore";
 import { useLiveComments } from "../hooks/useLiveComments";
 import CommentTree from "../components/comments/CommentTree";
@@ -15,6 +10,12 @@ import LiveIndicator from "../components/ui/LiveIndicator";
 import Pagination from "../components/posts/Pagination";
 import { formatDate } from "../utils/formatDate";
 import type { CommentNode } from "../types";
+import {
+  getCommentsApi,
+  createCommentApi,
+  replyToCommentApi,
+  deleteCommentApi,
+} from "../api/comments";
 
 const collectIds = (comments: CommentNode[]): Set<string> => {
   const ids = new Set<string>();
@@ -69,6 +70,11 @@ export default function PostDetailPage() {
     const newLive = liveComments.filter((c) => !existingIds.has(c.id));
     return [...rest, ...newLive];
   })();
+
+  const handleDeleteComment = async (commentId: string) => {
+    await deleteCommentApi(commentId);
+    queryClient.invalidateQueries({ queryKey: ["comments", id] });
+  };
 
   if (isLoading) {
     return (
@@ -410,6 +416,7 @@ export default function PostDetailPage() {
             comments={displayComments}
             postId={id!}
             onReply={handleReply}
+            onDelete={handleDeleteComment}
           />
         )}
 

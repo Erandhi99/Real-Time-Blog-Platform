@@ -5,9 +5,15 @@ interface Props {
   comments: T[];
   postId: string;
   onReply: (id: string, body: string) => Promise<void>;
+  onDelete: (id: string) => Promise<void>;
 }
 
-export default function CommentTree({ comments, postId, onReply }: Props) {
+export default function CommentTree({
+  comments,
+  postId,
+  onReply,
+  onDelete,
+}: Props) {
   if (comments.length === 0) {
     return (
       <div
@@ -28,7 +34,13 @@ export default function CommentTree({ comments, postId, onReply }: Props) {
   return (
     <div style={{ display: "flex", flexDirection: "column", gap: 0 }}>
       {comments.map((c) => (
-        <CommentNode key={c.id} comment={c} postId={postId} onReply={onReply} />
+        <CommentNode
+          key={c.id}
+          comment={c}
+          postId={postId}
+          onReply={onReply}
+          onDelete={onDelete}
+        />
       ))}
     </div>
   );
