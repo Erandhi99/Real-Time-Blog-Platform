@@ -242,6 +242,21 @@ export default function PostDetailPage() {
           </div>
           {user?.id === post.author.id && (
             <div style={{ display: "flex", gap: 8 }}>
+              <Link
+                to={`/edit/${post.id}`}
+                style={{
+                  padding: "5px 12px",
+                  borderRadius: 7,
+                  fontSize: 12,
+                  fontWeight: 500,
+                  background: "var(--surface2)",
+                  color: "var(--text2)",
+                  border: "1px solid var(--border)",
+                  textDecoration: "none",
+                }}
+              >
+                Edit
+              </Link>
               <button
                 onClick={handleDeletePost}
                 style={{
