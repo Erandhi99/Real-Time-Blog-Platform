@@ -2,20 +2,22 @@ import { useParams, Link, useNavigate } from "react-router-dom";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { useState } from "react";
 import { getPostApi, deletePostApi } from "../api/posts";
-import { useAuthStore } from "../store/authStore";
-import { useLiveComments } from "../hooks/useLiveComments";
-import CommentTree from "../components/comments/CommentTree";
-import CommentForm from "../components/comments/CommentForm";
-import LiveIndicator from "../components/ui/LiveIndicator";
-import Pagination from "../components/posts/Pagination";
-import { formatDate } from "../utils/formatDate";
-import type { CommentNode } from "../types";
 import {
   getCommentsApi,
   createCommentApi,
   replyToCommentApi,
   deleteCommentApi,
 } from "../api/comments";
+import { useAuthStore } from "../store/authStore";
+import { useLiveComments } from "../hooks/useLiveComments";
+import { useConfirm } from "../hooks/useConfirm";
+import CommentTree from "../components/comments/CommentTree";
+import CommentForm from "../components/comments/CommentForm";
+import LiveIndicator from "../components/ui/LiveIndicator";
+import ConfirmModal from "../components/ui/ConfirmModal";
+import Pagination from "../components/posts/Pagination";
+import { formatDate } from "../utils/formatDate";
+import type { CommentNode } from "../types";
 
 const collectIds = (comments: CommentNode[]): Set<string> => {
   const ids = new Set<string>();
@@ -35,6 +37,7 @@ export default function PostDetailPage() {
   const { isAuthenticated, user } = useAuthStore();
   const [commentPage, setCommentPage] = useState(1);
   const { liveComments, readerCount } = useLiveComments(id);
+  const { confirm, state, handleConfirm, handleCancel } = useConfirm();
 
   const { data: post, isLoading } = useQuery({
     queryKey: ["post", id],
@@ -49,9 +52,23 @@ export default function PostDetailPage() {
   });
 
   const handleDeletePost = async () => {
-    if (!confirm("Delete this post?")) return;
-    await deletePostApi(id!);
-    navigate("/");
+    const ok = await confirm({
+      title: "Delete post",
+      message:
+        "Are you sure you want to delete this post? This will also remove all comments and cannot be undone.",
+      confirmLabel: "Delete post",
+      danger: true,
+    });
+    if (!ok) return;
+    try {
+      await deletePostApi(id!);
+      // Invalidate post list cache and remove this post from cache
+      queryClient.invalidateQueries({ queryKey: ["posts"] });
+      queryClient.removeQueries({ queryKey: ["post", id] });
+      navigate("/");
+    } catch (err) {
+      console.error("Failed to delete post:", err);
+    }
   };
 
   const handleCreateComment = async (body: string) => {
@@ -64,17 +81,25 @@ export default function PostDetailPage() {
     queryClient.invalidateQueries({ queryKey: ["comments", id] });
   };
 
+  const handleDeleteComment = async (commentId: string) => {
+    const ok = await confirm({
+      title: "Delete comment",
+      message:
+        "Are you sure you want to delete this comment? It will be permanently deleted and cannot be undone.",
+      confirmLabel: "Delete comment",
+      danger: true,
+    });
+    if (!ok) return;
+    await deleteCommentApi(commentId);
+    queryClient.invalidateQueries({ queryKey: ["comments", id] });
+  };
+
   const displayComments = (() => {
     const rest = commentsData?.data ?? [];
     const existingIds = collectIds(rest);
     const newLive = liveComments.filter((c) => !existingIds.has(c.id));
     return [...rest, ...newLive];
   })();
-
-  const handleDeleteComment = async (commentId: string) => {
-    await deleteCommentApi(commentId);
-    queryClient.invalidateQueries({ queryKey: ["comments", id] });
-  };
 
   if (isLoading) {
     return (
@@ -109,6 +134,19 @@ export default function PostDetailPage() {
 
   return (
     <div>
+      {/* Confirm modal — renders when active */}
+      {state && (
+        <ConfirmModal
+          title={state.title}
+          message={state.message}
+          confirmLabel={state.confirmLabel}
+          cancelLabel={state.cancelLabel}
+          danger={state.danger}
+          onConfirm={handleConfirm}
+          onCancel={handleCancel}
+        />
+      )}
+
       {/* Back */}
       <Link
         to="/"
@@ -144,7 +182,6 @@ export default function PostDetailPage() {
           marginBottom: 28,
         }}
       >
-        {/* Top meta */}
         <div
           style={{
             display: "flex",
@@ -187,7 +224,6 @@ export default function PostDetailPage() {
           <LiveIndicator count={readerCount} />
         </div>
 
-        {/* Title */}
         <h1
           style={{
             fontSize: 22,
@@ -200,7 +236,6 @@ export default function PostDetailPage() {
           {post.title}
         </h1>
 
-        {/* Author row */}
         <div
           style={{
             display: "flex",
@@ -246,6 +281,7 @@ export default function PostDetailPage() {
               </p>
             </div>
           </div>
+
           {user?.id === post.author.id && (
             <div style={{ display: "flex", gap: 8 }}>
               <Link
@@ -282,7 +318,6 @@ export default function PostDetailPage() {
           )}
         </div>
 
-        {/* Body */}
         <div
           style={{
             fontSize: 14,
@@ -295,7 +330,7 @@ export default function PostDetailPage() {
         </div>
       </article>
 
-      {/* Comments */}
+      {/* Comments section */}
       <section>
         <h2
           style={{
@@ -320,7 +355,6 @@ export default function PostDetailPage() {
           )}
         </h2>
 
-        {/* Comment form */}
         <div
           style={{
             background: "var(--surface)",
@@ -366,7 +400,6 @@ export default function PostDetailPage() {
           )}
         </div>
 
-        {/* Tree */}
         {commentsLoading ? (
           <div style={{ display: "flex", flexDirection: "column", gap: 16 }}>
             {[...Array(3)].map((_, i) => (

@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { useNavigate, Link } from "react-router-dom";
-import { useQuery } from "@tanstack/react-query";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { createPostApi, getCategoriesApi, getTagsApi } from "../api/posts";
 import { useAuthStore } from "../store/authStore";
 import Button from "../components/ui/Button";
@@ -10,6 +10,7 @@ import axios from "axios";
 export default function CreatePostPage() {
   const { isAuthenticated } = useAuthStore();
   const navigate = useNavigate();
+  const queryClient = useQueryClient();
   const [title, setTitle] = useState("");
   const [body, setBody] = useState("");
   const [categoryId, setCategoryId] = useState("");
@@ -57,6 +58,8 @@ export default function CreatePostPage() {
         categoryId,
         tags: selectedTags,
       });
+      // Invalidate post list so home page refetches fresh data
+      queryClient.invalidateQueries({ queryKey: ["posts"] });
       navigate(`/posts/${post.id}`);
     } catch (err) {
       if (axios.isAxiosError(err)) {
