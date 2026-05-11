@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { useNavigate, useParams, Link } from "react-router-dom";
-import { useQuery } from "@tanstack/react-query";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
 import axios from "axios";
 
 import {
@@ -59,6 +59,7 @@ function EditForm({
   const [selectedTags, setSelectedTags] = useState<string[]>(initialTagIds);
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
+  const queryClient = useQueryClient();
 
   const toggleTag = (tagId: string) =>
     setSelectedTags((p) =>
@@ -74,12 +75,14 @@ function EditForm({
     setLoading(true);
     setError("");
     try {
-      await updatePostApi(postId, {
+      await updatePostApi(postId!, {
         title,
         body,
         categoryId,
         tags: selectedTags,
       });
+      queryClient.invalidateQueries({ queryKey: ["posts"] });
+      queryClient.invalidateQueries({ queryKey: ["post", postId] });
       navigate(`/posts/${postId}`);
     } catch (err) {
       if (axios.isAxiosError(err)) {
