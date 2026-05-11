@@ -25,7 +25,6 @@ export default function CommentNode({
   const isAuthor = user?.id === comment.author.id;
 
   const handleDelete = async () => {
-    if (!confirm("Delete this comment?")) return;
     setDeleting(true);
     try {
       await onDelete(comment.id);
