@@ -226,11 +226,11 @@ Frontend runs on **http://localhost:5173**
 
 The seed script (`backend/prisma/seed.ts`) creates:
 
-- **3 users** with hashed passwords
-- **3 categories** — Technology, Lifestyle, Science
-- **5 tags** — JavaScript, React, Node.js, Productivity, AI
-- **3 posts** with tags and categories assigned
-- **7+ comments** including nested replies up to 3 levels deep
+- **5 users** with hashed passwords
+- **5 categories** — Technology, Lifestyle, Science
+- **10 tags** — JavaScript, React, Node.js, Productivity, AI
+- **10+ posts** with tags and categories assigned
+- **20+ comments** including nested replies up to 3 levels deep
 
 Test credentials:
 
